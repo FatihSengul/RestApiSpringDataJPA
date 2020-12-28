@@ -1,11 +1,17 @@
 package com.fsengul.restapi.service;
 
+import com.fsengul.restapi.entity.Address;
 import com.fsengul.restapi.entity.Student;
+import com.fsengul.restapi.entity.Subject;
+import com.fsengul.restapi.repository.AddressRepository;
 import com.fsengul.restapi.repository.StudentRepository;
+import com.fsengul.restapi.repository.SubjectRepository;
 import com.fsengul.restapi.request.CreateStudentRequest;
+import com.fsengul.restapi.request.CreateSubjectRequest;
 import com.fsengul.restapi.request.InQueryRequest;
 import com.fsengul.restapi.request.UpdateStudentRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +26,12 @@ public class StudentService  {
     @Autowired
     StudentRepository studentRepository;
 
+    @Autowired
+    AddressRepository addressRepository;
+
+    @Autowired
+    SubjectRepository subjectRepository;
+
     public List<Student> getAllStudents () {
         return studentRepository.findAll();
     }
@@ -27,7 +39,34 @@ public class StudentService  {
     public Student createStudent (CreateStudentRequest createStudentRequest) {
         Student student = new Student(createStudentRequest);
 
+        Address address = new Address();
+        address.setStreet(createStudentRequest.getStreet());
+        address.setCity(createStudentRequest.getCity());
+
+        address = addressRepository.save(address);
+
+        student.setAddress(address);
         student = studentRepository.save(student);
+
+        List<Subject> subjectsList = new ArrayList<Subject>();
+
+        if(createStudentRequest.getSubjectsLearning() != null) {
+            for (CreateSubjectRequest createSubjectRequest :
+                    createStudentRequest.getSubjectsLearning()) {
+                Subject subject = new Subject();
+                subject.setSubjectName(createSubjectRequest.getSubjectName());
+                subject.setMarksObtained(createSubjectRequest.getMarksObtained());
+                subject.setStudent(student);
+
+                subjectsList.add(subject);
+            }
+
+            subjectRepository.saveAll(subjectsList);
+
+        }
+
+        student.setLearningSubjects(subjectsList);
+
         return student;
     }
 
@@ -85,4 +124,7 @@ public class StudentService  {
         return studentRepository.deleteByFirstName(firstName);
     }
 
+    public List<Student> getByCity (String city) {
+        return studentRepository.findByAddressCity(city);
+    }
 }

@@ -6,6 +6,9 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.Mapping;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,6 +30,13 @@ public class Student {
 
     @Column(name = "email")
     private String email;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @OneToMany(mappedBy = "student")
+    private List<Subject> learningSubjects;
 
     public Student (CreateStudentRequest createStudentRequest) {
         this.firstName = createStudentRequest.getFirstName();

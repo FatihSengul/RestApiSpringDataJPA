@@ -1,6 +1,7 @@
 package com.fsengul.restapi.controller;
 
 
+import com.fsengul.restapi.entity.Address;
 import com.fsengul.restapi.entity.Student;
 import com.fsengul.restapi.request.CreateStudentRequest;
 import com.fsengul.restapi.request.InQueryRequest;
@@ -143,6 +144,18 @@ public class StudentController {
     @DeleteMapping("deleteByFirstName/{firstName}")
     public String deleteStudent (@PathVariable String firstName) {
         return studentService.deleteStudent(firstName) + " Student(s) deleted";
+    }
+
+    @GetMapping("/getByCity/{city}")
+    public List<StudentResponse> getByCity(@PathVariable String city){
+        List<Student> studentList = studentService.getByCity(city);
+
+        List<StudentResponse> studentResponseList = new ArrayList<StudentResponse>();
+
+        studentList.stream().forEach(student -> {
+            studentResponseList.add(new StudentResponse(student));
+        });
+        return studentResponseList;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.fsengul.restapi.repository;
 
+import java.util.List;
 
 import com.fsengul.restapi.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,10 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student,Long> {
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
     List<Student> findByFirstName(String firstname);
 
     Student findByLastNameAndFirstName (String lastName, String firstName);
@@ -33,4 +35,9 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     @Transactional
     @Query("Delete From Student where firstName = :firstName")
     Integer deleteByFirstName (String firstName);
+
+    List<Student> findByAddressCity (String city);
+
+    @Query("From Student where address.city = :city")
+    List<Student> getByAddressCity (String city);
 }
